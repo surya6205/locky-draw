@@ -1,0 +1,6 @@
+{
+  "name": "DHARMALABH SAUBHAGYA DRAW",
+  "description": "Lucky Draw Management System for DHARMALABH SAUBHAGYA DRAW organized by Manish Jain with person-wise registration, unique sequential number generation, duplicate checks, scratch-to-reveal draw, and admin panel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

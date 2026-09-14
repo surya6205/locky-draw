@@ -1,0 +1,235 @@
+{
+  "entities": {
+    "Participant": {
+      "title": "Participant",
+      "description": "A registered person in the lucky draw",
+      "type": "object",
+      "properties": {
+        "drawNumber": {
+          "type": "string",
+          "description": "Unique 3+ digit formatted sequential number e.g. 001"
+        },
+        "sequenceNumber": {
+          "type": "number",
+          "description": "Numeric sequence index starting from 1"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Full name of the participant"
+        },
+        "fatherName": {
+          "type": "string",
+          "description": "Father name"
+        },
+        "motherName": {
+          "type": "string",
+          "description": "Mother name"
+        },
+        "mobile": {
+          "type": "string",
+          "description": "10 digit mobile number"
+        },
+        "location": {
+          "type": "string",
+          "description": "Selected city or location"
+        },
+        "compositeKey": {
+          "type": "string",
+          "description": "Unique key: lowercase trimmed fullName_fatherName_motherName_mobile"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of registration"
+        }
+      },
+      "required": [
+        "drawNumber",
+        "sequenceNumber",
+        "fullName",
+        "fatherName",
+        "motherName",
+        "mobile",
+        "location",
+        "compositeKey",
+        "createdAt"
+      ]
+    },
+    "PersonUniqueness": {
+      "title": "PersonUniqueness",
+      "description": "Unique entry preventing duplicate registration of the same person",
+      "type": "object",
+      "properties": {
+        "compositeKey": {
+          "type": "string",
+          "description": "Key formed by fullName_fatherName_motherName_mobile"
+        },
+        "participantId": {
+          "type": "string",
+          "description": "ID of participant document"
+        },
+        "drawNumber": {
+          "type": "string",
+          "description": "Lucky draw number"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": [
+        "compositeKey",
+        "participantId",
+        "drawNumber",
+        "createdAt"
+      ]
+    },
+    "MobileTracker": {
+      "title": "MobileTracker",
+      "description": "Tracks count of registered persons for each mobile number (max 5)",
+      "type": "object",
+      "properties": {
+        "mobile": {
+          "type": "string",
+          "description": "10-digit mobile number"
+        },
+        "count": {
+          "type": "number",
+          "description": "Number of persons registered under this mobile (1 to 5)"
+        },
+        "participantIds": {
+          "type": "array",
+          "description": "List of participant IDs"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last updated timestamp"
+        }
+      },
+      "required": [
+        "mobile",
+        "count",
+        "participantIds",
+        "updatedAt"
+      ]
+    },
+    "DrawWinner": {
+      "title": "DrawWinner",
+      "description": "Permanently saved completed lucky draw winner in draw history",
+      "type": "object",
+      "properties": {
+        "drawNumber": {
+          "type": "string",
+          "description": "Winning lucky draw number"
+        },
+        "participantId": {
+          "type": "string",
+          "description": "Participant ID"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Winner's name"
+        },
+        "fatherName": {
+          "type": "string",
+          "description": "Father's name"
+        },
+        "motherName": {
+          "type": "string",
+          "description": "Mother's name"
+        },
+        "mobile": {
+          "type": "string",
+          "description": "Mobile number"
+        },
+        "location": {
+          "type": "string",
+          "description": "Location"
+        },
+        "prize": {
+          "type": "string",
+          "description": "Prize or title awarded"
+        },
+        "wonAt": {
+          "type": "string",
+          "description": "ISO timestamp of winning"
+        },
+        "scratchRevealed": {
+          "type": "boolean",
+          "description": "Whether scratch card was revealed"
+        }
+      },
+      "required": [
+        "drawNumber",
+        "participantId",
+        "fullName",
+        "fatherName",
+        "motherName",
+        "mobile",
+        "location",
+        "prize",
+        "wonAt"
+      ]
+    },
+    "DrawConfig": {
+      "title": "DrawConfig",
+      "description": "System state including counter, registration lock, and draw lock",
+      "type": "object",
+      "properties": {
+        "currentSequence": {
+          "type": "number",
+          "description": "Current sequential number issued"
+        },
+        "registrationLocked": {
+          "type": "boolean",
+          "description": "Whether registration is locked"
+        },
+        "drawLocked": {
+          "type": "boolean",
+          "description": "Whether draw is locked"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last updated timestamp"
+        }
+      },
+      "required": [
+        "currentSequence",
+        "registrationLocked",
+        "drawLocked",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/participants/{participantId}": {
+      "schema": {
+        "$ref": "#/entities/Participant"
+      },
+      "description": "All registered participants with unique draw numbers"
+    },
+    "/unique_persons/{compositeKey}": {
+      "schema": {
+        "$ref": "#/entities/PersonUniqueness"
+      },
+      "description": "Document ID is the compositeKey, preventing duplicate registration at database level"
+    },
+    "/mobile_trackers/{mobile}": {
+      "schema": {
+        "$ref": "#/entities/MobileTracker"
+      },
+      "description": "Document ID is the 10-digit mobile number, tracking registered persons count"
+    },
+    "/winners/{winnerId}": {
+      "schema": {
+        "$ref": "#/entities/DrawWinner"
+      },
+      "description": "Draw history permanently saving each completed winner"
+    },
+    "/config/settings": {
+      "schema": {
+        "$ref": "#/entities/DrawConfig"
+      },
+      "description": "System settings and counter configuration"
+    }
+  }
+}

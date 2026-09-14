@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Config & Settings
+    match /config/{configId} {
+      allow read: if true;
+      allow write: if true; // Allows counter increment in registration transaction and admin updates
+    }
+
+    // Participants: Public can search their drawNumber or view entries
+    match /participants/{participantId} {
+      allow read: if true;
+      allow create: if request.resource.data.fullName is string
+                    && request.resource.data.drawNumber is string
+                    && request.resource.data.mobile is string
+                    && request.resource.data.mobile.size() == 10;
+      allow update, delete: if true; // Admin management
+    }
+
+    // Unique persons composite keys to prevent duplicate person registrations
+    match /unique_persons/{compositeKey} {
+      allow read: if true;
+      allow create: if !exists(/databases/$(database)/documents/unique_persons/$(compositeKey));
+      allow update, delete: if true;
+    }
+
+    // Mobile tracker to track count of persons per mobile (max 5)
+    match /mobile_trackers/{mobile} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Draw Winners history
+    match /winners/{winnerId} {
+      allow read: if true;
+      allow create, update, delete: if true;
+    }
+
+    // Default deny for all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
